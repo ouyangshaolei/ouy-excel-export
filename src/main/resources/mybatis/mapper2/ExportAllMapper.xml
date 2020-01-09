@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gwghk.crm.dao2.ExportAllMapper">
+    <!--    <select id="testProcedure" parameterType="java.util.Map" resultType="java.util.LinkedHashMap"-->
+    <!--            statementType="CALLABLE">-->
+    <!--        CALL sssss(#{name,jdbcType=VARCHAR})-->
+    <!--    </select>-->
+    <!--    F00001-->
+    <select id="selectNCustFollowDaily" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT * from(
+        SELECT
+        report_day reportDay,
+        emp_name empName,
+        cust_type custType,
+        first_follow_rate firstFollowRate,
+        first_follow_valid_rate firstFollowValidRate,
+        second_follow_rate secondFollowRate,
+        thirdly_follow_rate thirdlyFollowRate,
+        follow_one followOne,
+        follow_two followTwo,
+        follow_three followThree,
+        first_follow_valid_two firstFollowValidTwo,
+        first_follow_valid_total firstFollowValidTotal,
+        total total
+        from n_cust_follow_daily
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="reportDayStart != null">and report_day between #{reportDayStart} and #{reportDayEnd}</if>)a
+        LEFT JOIN (
+        SELECT
+        emp_name empName,
+        sum(follow_one) followOneSum,
+        sum(follow_two) followTwoSum,
+        sum(follow_three) followThreeSum,
+        sum(first_follow_valid_two) firstFollowValidTwoSum,
+        sum(first_follow_valid_total) firstFollowValidTotalSum,
+        sum(total) totalSum
+        from n_cust_follow_daily
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="reportDayStart != null">and report_day between #{reportDayStart} and #{reportDayEnd}</if>
+        GROUP BY
+        empName
+        ) b ON a.empName = b.empName
+        ORDER BY a.reportDay ASC , a.empName ASC
+    </select>
+    <!--    F00002-->
+    <select id="selectOtherCustFollowDaily" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT * from(
+        SELECT
+        report_day reportDay,
+        emp_name empName,
+        cust_type custType,
+        first_follow_rate firstFollowRate,
+        first_follow_valid_rate firstFollowValidRate,
+        second_follow_rate secondFollowRate,
+        thirdly_follow_rate thirdlyFollowRate,
+        follow_one followOne,
+        follow_two followTwo,
+        follow_three followThree,
+        first_follow_valid_two firstFollowValidTwo,
+        first_follow_valid_total firstFollowValidTotal,
+        total total
+        from other_cust_follow_daily
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="custType != null">and cust_type = #{custType}</if>
+        <if test="reportDayStart != null">and report_day between #{reportDayStart} and #{reportDayEnd}</if>
+        )a
+        LEFT JOIN (
+        SELECT
+        emp_name empName,
+        sum(follow_one) followOneSum,
+        sum(follow_two) followTwoSum,
+        sum(follow_three) followThreeSum,
+        sum(first_follow_valid_two) firstFollowValidTwoSum,
+        sum(first_follow_valid_total) firstFollowValidTotalSum,
+        sum(total) totalSum
+        from other_cust_follow_daily
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="custType != null">and cust_type = #{custType}</if>
+        <if test="reportDayStart != null">and report_day between #{reportDayStart} and #{reportDayEnd}</if>
+        GROUP BY
+        empName
+        ) b ON a.empName = b.empName
+        ORDER BY a.reportDay ASC , a.empName ASC
+    </select>
+    <!--    F00003-->
+    <select id="selectCustAssignDaily" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT
+        report_day reportDay,
+        cust_type custType,
+        emp_name empName,
+        cust_count custCount,
+        cust_count_fact custCountFact
+        from cust_assign_daily
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="reportDayStart != null">and report_day between #{reportDayStart} and #{reportDayEnd}</if>
+        <if test="custType != null">and cust_type = #{custType}</if>
+        ORDER BY report_day ASC , emp_name ASC
+    </select>
+    <!--    F00004-->
+    <select id="selectCustAssignDailyTotal" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT
+        sum(cust_count) custCount,
+        sum(cust_count_fact) custCountFact,
+        report_day reportDay,
+        emp_name empName
+        FROM
+        cust_assign_daily
+        WHERE
+        company_id = 1
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="reportDayStart != null">and report_day between #{reportDayStart} and #{reportDayEnd}</if>
+        GROUP BY
+        emp_name,
+        report_day
+        ORDER BY report_day ASC , emp_name ASC
+    </select>
+    <!--    F00005-->
+    <select id="selectCustAssignMonthly" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT
+        emp_name empName,
+        cust_type custType,
+        cust_count_fact custCountFact
+        from cust_assign_monthly
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="reportDay != null">and report_day = #{reportDay}</if>
+        ORDER BY emp_name ASC , cust_type ASC
+    </select>
+    <!--    F00006-->
+
+    <select id="selectCustPerformance" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        select
+        a.custType,
+        a.reportDay,
+        a.empName,
+        a.activateTotal,
+        a.reachRate,
+        a.targetNum,
+        a.activateLevelTotal,
+        a.accountLevelTranslate,
+        sum(activateNum) accountLevelTranslateTotal
+        from(
+        SELECT
+        cust_type custType,
+        report_day reportDay,
+        emp_name empName,
+        activate_num activateNum,
+        activate_total activateTotal,
+        reach_rate reachRate,
+        targetNum targetNum,
+        activate_level_total activateLevelTotal,
+        <choose>
+            <when test="companyId == 1">
+                case account_level
+                when 'mMin1' then '迷你'
+                when 'MIN' then '迷你'
+                when 'm.Min1.new' then '标准'
+                when 'STD' then '中端'
+                when 'mSTD1' then '中端'
+                when 'sSTD1' then '中端'
+                when 'VIP' then '高端'
+                when 'mVIP1' then '高端'
+                when 'mVIP2' then '高端'
+                when 'sVIP1' then '高端'
+                when 'mHIG1' then '高端'
+                else account_level end accountLevelTranslate,
+            </when>
+            <when test="companyId == 3">
+                case account_level
+                when 'MIN-new' then '基础'
+                when 'STD-new' then '进阶'
+                when 'VIP-new' then '尊贵'
+                when 'MIN' then '迷你'
+                when 'STD' then '标准'
+                when 'VIP' then '高端'
+                else account_level end accountLevelTranslate,
+            </when>
+            <when test="companyId == 14">
+                case account_level
+                when 'mMIN1' then '入门'
+                when 'MIN' then '入门'
+                when 'STD' then '进阶'
+                when 'mSTD1' then '进阶'
+                when 'sSTD1' then '进阶'
+                when 'MIN.new' then '标准'
+                when 'VIP' then '专业'
+                when 'mVIP1' then '专业'
+                when 'mVIP2' then '专业'
+                when 'sVIP1' then '专业'
+                else account_level end accountLevelTranslate,
+            </when>
+        </choose>
+        account_level accountLevel
+        from cust_performance_monthly_view
+        where company_id = #{companyId}
+        <if test="empName != null">and emp_name ${empName}</if>
+        <if test="reportDay != null">and report_day = #{reportDay}</if>
+        )a
+        GROUP BY
+        custType,
+        accountLevelTranslate,
+        empName,
+        activateTotal,
+        reachRate,
+        targetNum,
+        activateLevelTotal,
+        accountLevelTranslate
+        ORDER BY custType ASC , accountLevelTranslate ASC,empName ASC
+    </select>
+    <select id="selectTEST" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT
+        *
+        from hobby  ORDER BY week ASC,hobby ASC,name ASC
+    </select>
+</mapper>

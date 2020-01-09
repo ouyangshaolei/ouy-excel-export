@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <contextName>crm</contextName>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger{0} %L : %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logs/crm-api/crm.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/logs/crm-api/crm.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>60</MaxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger{0} %L : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+                <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </root>
+    <logger name="org.springframework.web" level="WARN"/>
+    <logger name="org.springframework.controllers" level="WARN"/>
+    <logger name="org.springframework.data.mongodb.core" level="DEBUG"/>
+    <logger name="com.gwghk.crm.dao" level="DEBUG"/>
+</configuration>
